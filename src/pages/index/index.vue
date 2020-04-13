@@ -10,117 +10,37 @@
     或者 indicator-dots-->
     <view class="swiper-box">
       <swiper :indicator-dots="true" indicator-color="rgba(255,0,0,.8)" :autoplay="true">
-        <swiper-item>
-          <navigator url class="nav">
-            <img src="../../static/uploads/banner1.png" alt />
-          </navigator>
-        </swiper-item>
-
-        <swiper-item>
-          <navigator url class="nav">
-            <img src="../../static/uploads/banner2.png" alt />
-          </navigator>
-        </swiper-item>
-
-        <swiper-item>
-          <navigator url class="nav">
-            <img src="../../static/uploads/banner3.png" alt />
+        <swiper-item v-for="item in swiperlist" :key="item.goods_id" >
+          <navigator url="/pages/goods/index" class="nav">
+            <img :src="item.image_src" alt />
           </navigator>
         </swiper-item>
       </swiper>
     </view>
     <!-- 导航部分 -->
     <view class="nav">
-      <navigator url>
-        <img src="../../static/uploads/icon_index_nav_1@2x.png" alt />
-      </navigator>
-      <navigator url>
-        <img src="../../static/uploads/icon_index_nav_2@2x.png" alt />
-      </navigator>
-      <navigator url>
-        <img src="../../static/uploads/icon_index_nav_3@2x.png" alt />
-      </navigator>
-      <navigator url>
-        <img src="../../static/uploads/icon_index_nav_4@2x.png" alt />
+      <!-- key只要是唯一的就行 -->
+      <navigator url="/pages/category/index" v-for="item in navlist" :key="item.image_src">
+        <img :src="item.image_src" alt />
       </navigator>
     </view>
     <!-- 内容部分 -->
     <view class="box">
       <!-- 每个楼层包含标题和5个图片内容 -->
-      <view class="floor">
+      <view class="floor" v-for="(item,index) in floors" :key="index">
         <!-- 标题 -->
-        <view class="floor-title">
-          <img src="../../static/uploads/pic_floor01_title.png" alt />
+        <view   class="floor-title">
+          <img :src="item.floor_title.image_src" alt />
         </view>
         <!-- 5个图片 -->
-        <view class="item">
-          <navigator url>
-            <img src="../../static/uploads/pic_floor01_1@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor01_2@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor01_3@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor01_4@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor01_5@2x.png" alt />
+        <view class="item" >
+          <navigator url  v-for=" sub in item.product_list" :key="sub.name">
+            <img :src="sub.image_src" alt />
           </navigator>
         </view>
       </view>
-       <!-- 每个楼层包含标题和5个图片内容 -->
-      <view class="floor">
-        <!-- 标题 -->
-        <view class="floor-title">
-          <img src="../../static/uploads/pic_floor02_title.png" alt />
-        </view>
-        <!-- 5个图片 -->
-        <view class="item">
-          <navigator url>
-            <img src="../../static/uploads/pic_floor02_1@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor02_2@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor02_3@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor02_4@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor02_5@2x.png" alt />
-          </navigator>
-        </view>
-      </view>
-      <!-- 每个楼层包含标题和5个图片内容 -->
-      <view class="floor">
-        <!-- 标题 -->
-        <view class="floor-title">
-          <img src="../../static/uploads/pic_floor01_title.png" alt />
-        </view>
-        <!-- 5个图片 -->
-        <view class="item">
-          <navigator url>
-            <img src="../../static/uploads/pic_floor03_1@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor03_2@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor03_3@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor03_4@2x.png" alt />
-          </navigator>
-          <navigator url>
-            <img src="../../static/uploads/pic_floor03_5@2x.png" alt />
-          </navigator>
-        </view>
-      </view>
+      
+      
      
     </view>
   </view>
@@ -131,14 +51,15 @@
 import search from '@/components/search.vue'
 export default {
   components:{
-    // 组件标签名，组件
+    // 组件标签名，组件 
     search
   },
   data() {
     return {
       h:'auto',//默认可以滚动
       swiperlist:[],//轮播图数据
-      navlist:[]//导航菜单数据
+      navlist:[],//导航菜单数据
+      floors:[]//内容图片数据
     }
   },
   methods: {
@@ -146,7 +67,6 @@ export default {
       // console.log(height);
       // 赋值高度
       this.h=height
-      
     },
     // 发送轮播图数据请求
    async getSwiper(){
@@ -165,17 +85,39 @@ export default {
         url:"/api/public/v1/home/swiperdata"
       })
       console.log(result);
-      
       // console.log(data[1]);
       // console.log(data[1].data);
+      this.swiperlist=result.message
+    },
+     async getnavs(){
+       let res =await this.http({
+         url:"/api/public/v1/home/catitems"
+       })
+       console.log(res);
+       this.navlist=res.message
+    },
+     async getfloors(){
+       let data =await this.http({
+         url:"/api/public/v1/home/floordata"
+       })
+       console.log(data);
+       this.floors=data.message
     }
-   
-   },
-
+  },
   onLoad(){
-    this.getSwiper()
+    this.getSwiper(),
+    this.getnavs(),
+    this.getfloors()
+  },
+  // 监听下拉刷新函数
+  onPullDownRefresh(){
+    console.log('下拉刷新了')
+    // 下拉刷新就是把所有的数据从新获取一遍
+     this.getSwiper(),
+    this.getnavs(),
+    this.getfloors()
   }
-};
+}
 </script>
 
 <style lang="less" scoped>
