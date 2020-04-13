@@ -1,14 +1,8 @@
 <template>
   <!-- 每个组件都有一个根标签，给个类名 -->
-  <view class="index">
-    <!-- 头部search搜索框 -->
-    <view class="search">
-      <view class="search-input">
-        <input placeholder="请输入搜索商品" type="text" />
-      </view>
-      <!-- 搜索结果内容 -->
-      <view class="search-content"></view>
-    </view>
+  <view class="index" :style="{overflow:'hidden',height:h}">
+   <!-- 搜索框 -->
+   <search @my="indexHeight"></search>
     <!-- 轮播图 -->
     <!-- 255,0,0 红色，255,255,255白色 -->
     <!-- indicator-dots="true"字符串
@@ -133,29 +127,58 @@
 </template>
 
 <script>
+// 导入搜索组件，注册，使用
+import search from '@/components/search.vue'
 export default {
-  data() {
-    return {};
+  components:{
+    // 组件标签名，组件
+    search
   },
-  onLoad() {},
-  methods: {}
+  data() {
+    return {
+      h:'auto',//默认可以滚动
+      swiperlist:[],//轮播图数据
+      navlist:[]//导航菜单数据
+    }
+  },
+  methods: {
+    indexHeight(height){
+      // console.log(height);
+      // 赋值高度
+      this.h=height
+      
+    },
+    // 发送轮播图数据请求
+   async getSwiper(){
+      // uni.request({
+      //   url:'https://www.uinav.com/api/public/v1/home/swiperdata',
+      //   // method:'',
+      //   // data:{},//参数
+      //   // header:{},//请求头
+      //   success:function (res) {
+      //       console.log(res);
+            
+      //   }
+      // })
+      // 第二种promise形式uniapp封装好了
+      let result = await this.http({
+        url:"/api/public/v1/home/swiperdata"
+      })
+      console.log(result);
+      
+      // console.log(data[1]);
+      // console.log(data[1].data);
+    }
+   
+   },
+
+  onLoad(){
+    this.getSwiper()
+  }
 };
 </script>
 
 <style lang="less" scoped>
-.search {
-  .search-input {
-    background-color: #ea4451;
-    padding: 18rpx;
-    input {
-      background-color: #fff;
-      font-size: 26rpx;
-      color: black;
-      padding-left: 15rpx;
-      height: 60rpx;
-    }
-  }
-}
 .swiper-box {
   // swiper默认有一个高度是150rpx
   swiper {
@@ -163,10 +186,10 @@ export default {
     navigator {
       width: 750rpx;
       height: 340rpx;
-      img {
-        width: 100%;
-        height: 100%;
-      }
+      // img {
+      //   width: 100%;
+      //   height: 100%;
+      // }
     }
   }
 }
@@ -203,10 +226,10 @@ export default {
         height: 188rpx;
         margin-left: 10rpx;
         margin-bottom: 10rpx;
-        img {
-          width: 100%;
-          height: 100%;
-        }
+        // img {
+        //   width: 100%;
+        //   height: 100%;
+        // }
       }
       navigator:nth-child(1) {
         height: 386rpx;
